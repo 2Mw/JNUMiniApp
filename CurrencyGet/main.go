@@ -1,6 +1,7 @@
 package main
 
 import (
+	"JNUMiniApp/CurrencyGet/cmd"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -100,10 +101,11 @@ func Attention() {
 	fmt.Println("SHALL BE BORNE BY THE USER. ALL THE CONSEQUENCES HAVE NOTHING WITH")
 	fmt.Println("THE DEVELOPER. PLEASE DELETE THIS SOFTWARE WITHIN 24 HOURS.")
 	fmt.Println("=============================  WARNING  =============================")
-	fmt.Println("※Release Version: 1.0, release time: 2021-10-11 22:55※")
+	fmt.Println("\n※Release Version: 1.0, release time: 2021-10-11 22:55※")
 }
 
 func main() {
+	cmd.Execute()
 	Attention()
 	fmt.Println("\n")
 	b := examineNetworkEnv()
@@ -117,7 +119,9 @@ func main() {
 	_, _ = fmt.Scanf("%s\n", &xh)
 	log.Printf("Starting working for %v, Threads: %v\n", xh, threads)
 	if len(xh) != 10 {
-		log.Fatal("Your student number is invalid.")
+		log.Println("Your student number is invalid.")
+		_, _ = fmt.Scanf("%s")
+		return
 	}
 
 	wg.Add(threads)
@@ -125,6 +129,7 @@ func main() {
 		go getOnce()
 	}
 	wg.Wait()
-	log.Printf("\nYou have succeed for %.2f GB currency. S/F(%v/%v)\n", float32(successCount)*5.4, successCount, failCount)
+	fmt.Println()
+	log.Printf("You have succeed for %.2f GB currency. S/F(%v/%v)\n", float32(successCount)*5.4, successCount, failCount)
 	_, _ = fmt.Scanf("%s")
 }

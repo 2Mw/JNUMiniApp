@@ -15,13 +15,14 @@ var (
 
 var rootCmd = &cobra.Command{
 	Use:              "",
+	Short:            "Short text for program",
 	Long:             "Illustration of AirJ Login program",
 	TraverseChildren: true, // 允许在主命令上使用flag
 	Run: func(cmd *cobra.Command, args []string) {
 		acc, pass := service.ReadLoginData() // 获取配置文件
 		if len(acc) > 0 && len(pass) > 0 {
 			service.Login(acc, pass)
-		}else{
+		} else {
 			log.Println("Account parameter error.")
 		}
 		time.Sleep(time.Second * 2)
@@ -36,6 +37,6 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.AddCommand(versionCmd, changeCmd, listCmd, delCmd)
+	rootCmd.AddCommand(versionCmd, changeCmd, listCmd, delCmd, logoutCmd)
 	cobra.MousetrapHelpText = ""
 }

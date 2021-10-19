@@ -92,10 +92,10 @@ func AddLoginData(acc string, pass *string) bool {
 	has := false
 	for i, item := range data.Alternatives {
 		if item.Acc == acc {
-			if len(*pass) >= 6{
+			if len(*pass) >= 6 {
 				data.Alternatives[i].Pass = *pass
-			}else{
-				pass = &item.Pass	// 返回密码
+			} else {
+				*pass = item.Pass // 返回密码
 			}
 			has = true
 			break
@@ -108,7 +108,7 @@ func AddLoginData(acc string, pass *string) bool {
 				Acc:  acc,
 				Pass: *pass,
 			})
-		}else{
+		} else {
 			log.Println("New account password is invalid or not specified")
 			return false
 		}
@@ -137,6 +137,8 @@ func DelAccount(acc string) bool {
 		return false
 	}
 
+	has := false
+
 	for i, item := range data.Alternatives {
 		if item.Acc == acc {
 			if i == len(data.Alternatives)-1 {
@@ -144,8 +146,14 @@ func DelAccount(acc string) bool {
 			} else {
 				data.Alternatives = append(data.Alternatives[0:i], data.Alternatives[i+1:]...)
 			}
+			has = true
 			break
 		}
+	}
+
+	if !has {
+		log.Println("This account not exists.")
+		return false
 	}
 
 	info, _ := json.Marshal(data)

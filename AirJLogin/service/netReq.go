@@ -30,7 +30,7 @@ func GetCurrency(id string) (cur string) {
 	//req.Header.Set("Content-Type", "text/plain;charset=UTF-8")
 	rsp, err := client.Do(req)
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("Init client error : %v\n", err)
 	}
 	//fmt.Println(rsp.Status)
 	data, _ := io.ReadAll(rsp.Body)
@@ -72,7 +72,7 @@ func Login(acc string, pass string) {
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	rsp, err := client.Do(req)
 	if err != nil {
-		log.Fatal("Not connect to inner network," + err.Error())
+		log.Println("Not connect to inner network," + err.Error())
 	}
 	defer rsp.Body.Close()
 	if rsp.StatusCode == 200 {
@@ -97,7 +97,7 @@ func Login(acc string, pass string) {
 		}
 
 	} else {
-		log.Fatal("Network unknown error.")
+		log.Println("Network unknown error.")
 	}
 }
 
@@ -127,7 +127,7 @@ func GetMyIP() string {
 	log.Println("Examine if in inner network...")
 	conn, err := net.Dial("udp", "210.28.18.6:80")
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("Get network err: %v\n", err)
 	}
 	defer conn.Close()
 	localAddr := conn.LocalAddr().(*net.UDPAddr)

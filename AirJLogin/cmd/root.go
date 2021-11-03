@@ -32,6 +32,7 @@ var rootCmd = &cobra.Command{
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		log.Println("Input command format error.")
+		time.Sleep(time.Second * 2)
 		os.Exit(1)
 	}
 }

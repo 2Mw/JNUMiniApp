@@ -10,6 +10,6 @@ var versionCmd = &cobra.Command{
 	Short: "Show version",
 	Long:  "Show AirJ Login program version",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("ArijLogin Version 1.0.211018")
+		fmt.Println("ArijLogin Version 1.0.211104")
 	},
 }

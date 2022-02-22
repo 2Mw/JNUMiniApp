@@ -50,4 +50,6 @@ var Status = []string{
 	"47|Oppp error: TOO MANY CONNECTIONS|运营商账号在线|Operator account online",
 	"48|Oppp error: Timeout|运营商账号状态异常(欠费等)|Operator account status abnormal(arrears, etc.)",
 	"49|Oppp error: User dial-in so soon|运营商账号刚下线|Operator account just off the assembly line",
+	"512|512|Portal协议参数不全，请稍后再试|Portal new extension error cannot be identified, please try again later",
+	"999|999|Portal新扩展错误无法识别，请稍后再试|Parameter number is not enough",
 }

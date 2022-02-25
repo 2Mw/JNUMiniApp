@@ -129,6 +129,6 @@ func StartThreads(threads int) {
 	}
 	wg.Wait()
 	fmt.Println()
-	log.Printf("You have succeed for %.2f GB currency. S/F(%v/%v)\n", float32(successCount)*5.4, successCount, failCount)
+	log.Printf("You have succeed for %.2f GB currency. S/F(%v/%v)\n", float32(successCount)*54, successCount, failCount)
 	_, _ = fmt.Scanf("%s")
 }

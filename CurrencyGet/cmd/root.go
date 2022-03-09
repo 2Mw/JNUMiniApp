@@ -9,8 +9,8 @@ import (
 )
 
 const (
-	version     = "v1.1.220222"
-	releaseDate = "2022/02/25"
+	version     = "v1.1.220309"
+	releaseDate = "2022/03/09"
 )
 
 var threads = 0

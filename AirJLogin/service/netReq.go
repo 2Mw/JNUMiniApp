@@ -7,26 +7,27 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"net"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
 )
 
+var UA string = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36"
+
 func GetCurrency(id string) (cur string) {
 	//link := "https://app.jiangnan.edu.cn/jnapp/action/invokeMobile/invoke?inStrParams={\"serviceId\": \"1100002\",\"userid\": \""+id+"\"}"
 	//link := "https://httpbin.org/get?inStrParams={\"serviceId\": \"1100002\",\"userid\": \""+id+"\"}"
 	uri, _ := url.Parse("https://app.jiangnan.edu.cn/jnapp/action/invokeMobile/invoke")
 	//由于Go语言不会对URL自动进行编码，因此需要使用url.values进行编码，否则会出错
-	params := url.Values{
+	param := url.Values{
 		"inStrParams": {"{\"serviceId\": \"1100002\",\"userid\": \"" + id + "\"}"},
 	}
-	uri.RawQuery = params.Encode()
+	uri.RawQuery = param.Encode()
 	client := &http.Client{}
 	//fmt.Println(uri.String())
 	req, _ := http.NewRequest("GET", uri.String(), nil)
-	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36")
+	req.Header.Set("User-Agent", UA)
 	//req.Header.Set("Content-Type", "text/plain;charset=UTF-8")
 	rsp, err := client.Do(req)
 	if err != nil {
@@ -53,7 +54,12 @@ func GetCurrency(id string) (cur string) {
 }
 
 func Login(acc string, pass string) {
-	ip := GetMyIP()
+	log.Println("Examine if in inner network...")
+	ip, err := GetMyIP()
+	if err != nil {
+		log.Println("Maybe you are not in school inner network: " + err.Error())
+		return
+	}
 	link := fmt.Sprintf("http://210.28.18.6:801/eportal/?c=ACSetting&a=Login&protocol=http:&hostname=210.28.18.6&iTermType=1&mac=00-00-00-00-00-00&ip=%s&enAdvert=0&queryACIP=0&loginMethod=1", ip)
 	param := url.Values{ // data
 		"DDDDD":  {",0," + acc + ""},
@@ -68,7 +74,7 @@ func Login(acc string, pass string) {
 	client := &http.Client{}
 
 	req, _ := http.NewRequest("POST", link, strings.NewReader(param.Encode()))
-	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36")
+	req.Header.Set("User-Agent", UA)
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 	rsp, err := client.Do(req)
 	if err != nil {
@@ -101,7 +107,28 @@ func Login(acc string, pass string) {
 	}
 }
 
-func Logout() {
+func Logout(ip string, mac string) {
+	// new Logout
+	link := fmt.Sprintf("http://210.28.18.6:801/eportal/?c=ACSetting&a=Logout&wlanuserip=%v&mac=%v&wlanacip=210.28.18.5&wlanacname=2166wx", ip, mac)
+	client := http.Client{}
+	req, err := http.NewRequest("GET", link, nil)
+	if err != nil {
+		log.Println("Create request error:" + err.Error())
+		return
+	}
+	req.Header.Set("User-Agent", UA)
+	rsp, err := client.Do(req)
+	if err != nil {
+		log.Println("Logout network error:" + err.Error())
+		return
+	} else {
+		if rsp.StatusCode == 200 {
+			LogoutOld()
+		}
+	}
+}
+
+func LogoutOld() {
 	link := "http://210.28.18.3/F.htm"
 	client := http.Client{}
 	req, err := http.NewRequest("GET", link, nil)
@@ -109,7 +136,7 @@ func Logout() {
 		log.Println("Logout error:" + err.Error())
 		return
 	}
-	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36")
+	req.Header.Set("User-Agent", UA)
 	rsp, err := client.Do(req)
 	if err != nil {
 		log.Printf("Error %v\n", err.Error())
@@ -120,16 +147,50 @@ func Logout() {
 			log.Println(fmt.Sprintf("Network invalid code:%v\n", rsp.StatusCode))
 		}
 	}
-
 }
 
-func GetMyIP() string {
-	log.Println("Examine if in inner network...")
-	conn, err := net.Dial("udp", "210.28.18.6:80")
-	if err != nil {
-		log.Printf("Get network err: %v\n", err)
+func GetCurrentUser(ip, mac string) (string, error) {
+	link := "http://210.28.18.6:801/eportal/?c=ACSetting&a=getAccountByMac"
+	param := url.Values{
+		"wlanuserip": {ip},
+		"mac":        {mac},
 	}
-	defer conn.Close()
-	localAddr := conn.LocalAddr().(*net.UDPAddr)
-	return localAddr.IP.String()
+	client := &http.Client{}
+
+	req, _ := http.NewRequest("POST", link, strings.NewReader(param.Encode()))
+	req.Header.Set("User-Agent", UA)
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	rsp, err := client.Do(req)
+
+	if err != nil {
+		return "", fmt.Errorf("Network error: " + err.Error())
+	}
+	defer rsp.Body.Close()
+	if rsp.StatusCode == 200 {
+		body, _ := io.ReadAll(rsp.Body)
+		rsp := params.GetUserRsp{}
+		// JSON process invalid char sequence
+		i := 0
+		for body[i] != 123 {
+			i++
+		}
+		body = body[i:]
+
+		err := json.Unmarshal(body, &rsp)
+
+		if err != nil {
+			if e, ok := err.(*json.SyntaxError); ok {
+				log.Printf("Error at byte %d\n", e.Offset)
+			}
+			return "", fmt.Errorf("Parse resp json format error: %v\n", err)
+		}
+		if rsp.Result == "ok" {
+			return fmt.Sprintf("%v-%v", rsp.Account, rsp.Password), nil
+		} else {
+			return "Not login", nil
+		}
+	} else {
+		return "", fmt.Errorf("Get status code: %v\n", rsp.StatusCode)
+	}
 }

@@ -38,6 +38,6 @@ func Execute() {
 }
 
 func init() {
-	rootCmd.AddCommand(versionCmd, changeCmd, listCmd, delCmd, logoutCmd)
+	rootCmd.AddCommand(versionCmd, changeCmd, listCmd, delCmd, logoutCmd, infoCmd)
 	cobra.MousetrapHelpText = ""
 }

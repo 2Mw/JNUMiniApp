@@ -16,9 +16,9 @@ import (
 var UA string = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.86 Safari/537.36"
 
 func GetCurrency(id string) (cur string) {
-	//link := "https://app.jiangnan.edu.cn/jnapp/action/invokeMobile/invoke?inStrParams={\"serviceId\": \"1100002\",\"userid\": \""+id+"\"}"
+	//link := "https://e.jiangnan.edu.cn/jnapp/action/invokeMobile/invoke?inStrParams={\"serviceId\": \"1100002\",\"userid\": \""+id+"\"}"
 	//link := "https://httpbin.org/get?inStrParams={\"serviceId\": \"1100002\",\"userid\": \""+id+"\"}"
-	uri, _ := url.Parse("https://app.jiangnan.edu.cn/jnapp/action/invokeMobile/invoke")
+	uri, _ := url.Parse("https://e.jiangnan.edu.cn/jnapp/action/invokeMobile/invoke")
 	//由于Go语言不会对URL自动进行编码，因此需要使用url.values进行编码，否则会出错
 	param := url.Values{
 		"inStrParams": {"{\"serviceId\": \"1100002\",\"userid\": \"" + id + "\"}"},

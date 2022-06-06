@@ -46,7 +46,7 @@ func init() {
 func newReq() *http.Request {
 	now := rand.Int63n(1000) + +time.Now().Unix()*1000
 
-	uri, _ := url.Parse("https://app.jiangnan.edu.cn/jnapp/action/invokeMobile/invoke")
+	uri, _ := url.Parse("https://e.jiangnan.edu.cn/jnapp/action/invokeMobile/invoke")
 	params := url.Values{
 		"inStrParams": {"{\"e_account\":\"" + xh + "\",\"serviceId\":\"1100015\"}"},
 		"_":           {fmt.Sprintf("%v", now)},

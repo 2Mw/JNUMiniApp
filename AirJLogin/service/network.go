@@ -8,10 +8,10 @@ import (
 
 func GetMyIP() (string, error) {
 	conn, err := net.Dial("udp", "210.28.18.6:80")
-	defer conn.Close()
 	if err != nil {
 		return "", err
 	}
+	defer conn.Close()
 	localAddr := conn.LocalAddr().(*net.UDPAddr)
 	return localAddr.IP.String(), nil
 }

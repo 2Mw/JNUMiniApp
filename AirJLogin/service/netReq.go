@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"net/url"
@@ -107,27 +108,56 @@ func Login(acc string, pass string) {
 	}
 }
 
-func Logout(ip string, mac string) {
-	// new Logout
-	link := fmt.Sprintf("http://210.28.18.6:801/eportal/?c=ACSetting&a=Logout&wlanuserip=%v&mac=%v&wlanacip=210.28.18.5&wlanacname=2166wx", ip, mac)
-	client := http.Client{}
-	req, err := http.NewRequest("GET", link, nil)
+func Logout() {
+	link := "http://210.28.18.3/drcom/logout?callback=dr1002&jsVersion=4.1.3&v=5378&lang=zh"
+	method := "GET"
+
+	client := &http.Client{}
+	req, err := http.NewRequest(method, link, nil)
+
 	if err != nil {
-		log.Println("Create request error:" + err.Error())
+		fmt.Println(err)
 		return
 	}
-	req.Header.Set("User-Agent", UA)
-	rsp, err := client.Do(req)
+	req.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36")
+
+	res, err := client.Do(req)
 	if err != nil {
-		log.Println("Logout network error:" + err.Error())
+		fmt.Println(err)
 		return
-	} else {
-		if rsp.StatusCode == 200 {
-			LogoutOld()
-		}
+	}
+	defer res.Body.Close()
+
+	_, err = ioutil.ReadAll(res.Body)
+	if err != nil {
+		fmt.Println(err)
+		return
 	}
 }
 
+// Deprecated
+//func Logout(ip string, mac string) {
+//	// new Logout
+//	link := fmt.Sprintf("http://210.28.18.6:801/eportal/?c=ACSetting&a=Logout&wlanuserip=%v&mac=%v&wlanacip=210.28.18.5&wlanacname=2166wx", ip, mac)
+//	client := http.Client{}
+//	req, err := http.NewRequest("GET", link, nil)
+//	if err != nil {
+//		log.Println("Create request error:" + err.Error())
+//		return
+//	}
+//	req.Header.Set("User-Agent", UA)
+//	rsp, err := client.Do(req)
+//	if err != nil {
+//		log.Println("Logout network error:" + err.Error())
+//		return
+//	} else {
+//		if rsp.StatusCode == 200 {
+//			LogoutOld()
+//		}
+//	}
+//}
+
+// Deprecated
 func LogoutOld() {
 	link := "http://210.28.18.3/F.htm"
 	client := http.Client{}
